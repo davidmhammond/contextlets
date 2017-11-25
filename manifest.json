@@ -3,6 +3,7 @@
 	"name": "Contextlets",
 	"version": "0.1.0",
 	"description": "Allows you to add custom context menu items that execute JavaScript.",
+	"homepage_url": "https://github.com/davidmhammond/contextlets",
 	"permissions":
 	[
 		"bookmarks",
