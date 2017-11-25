@@ -1,0 +1,52 @@
+html
+{
+	margin: 0;
+	padding: 0;
+}
+
+body
+{
+	background: #fff;
+	color: #000;
+	font-family: sans-serif;
+	margin: 0;
+	padding: 16px;
+}
+
+h1
+{
+	margin-top: 0;
+}
+
+a:link,
+a:visited
+{
+	color: #0a8dff;
+	text-decoration: none;
+	transition:
+		color .15s;
+}
+
+a:hover
+{
+	color: #0060df;
+	text-decoration: underline;
+}
+
+a:active
+{
+	color: #003eaa;
+}
+
+dt
+{
+	font-weight: bold;
+}
+
+p code, var
+{
+	background: #e7e7e7;
+	font-family: monospace;
+	font-style: normal;
+	padding: 0 2px;
+}

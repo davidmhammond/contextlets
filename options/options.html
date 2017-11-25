@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<title>Options Page</title>
+		<link rel="stylesheet" type="text/css" href="options.css">
+	</head>
+	<body>
+		<div>
+			<div class="main-options">
+				<div class="left">
+					<a href="/docs/reference.html" target="_blank">API Reference</a>
+				</div>
+				
+				<div class="right checkables">
+					<div class="browser-style">
+						<input type="checkbox" name="validate" id="validate-toggle"> <label for="validate-toggle">Enable JavaScript syntax checking</label>
+					</div>
+				</div>
+			</div>
+			
+			<div id="item-template" hidden>
+				<div class="item">
+					<div class="item-content">
+						<form class="prefs cols-2">
+							<div class="left">
+								<div class="separator-title-container">
+									<span>Separator</span>
+								</div>
+								
+								<div class="title-container cols-2">
+									<div class="left">
+										<div class="cols-2">
+											<div class="left minor">
+												<button type="button" class="icon-preview" title="Click to change the icon"></button>
+											</div>
+											
+											<div class="right">
+												<label class="browser-style">
+													<span>Menu Item Text</span>
+													
+													<input type="text" name="title" class="field title browser-style">
+												</div>
+											</div>
+										</label>
+									</div>
+									
+									<div class="right minor">
+										<span>Icon</span>
+										
+										<div class="file-selector icons">
+											<input type="file" name="icons" accept="image/*">
+											<button type="button" class="file-remove-button" title="Remove the icon for this menu item">Remove Icon</button>
+										</div>
+									</div>
+								</div>
+								
+								<div class="code-container">
+									<label>
+										<span>JavaScript Code <span class="status"></span></span>
+										
+										<textarea name="code" class="field code browser-style" rows="10"></textarea>
+									</label>
+								</div>
+								
+								<div class="patterns-container">
+									<label>
+										<span>URL Patterns to Match (one per line)</span>
+										
+										<textarea name="patterns" class="field patterns browser-style" rows="3"></textarea>
+									</label>
+								</div>
+							</div>
+							
+							<div class="right minor">
+								<div class="context-container checkables">
+									<span>Contexts</span>
+									
+									<ul>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="page"> <label>Page</label></li>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="selection"> <label>Selection</label></li>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="tab"> <label>Tab</label></li>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="link"> <label>Link</label></li>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="frame"> <label>Frame</label></li>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="image"> <label>Image</label></li>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="video"> <label>Video</label></li>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="audio"> <label>Audio</label></li>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="editable"> <label>Editable field</label></li>
+										<li class="browser-style"><input type="checkbox" name="context" class="context" value="password"> <label>Password field</label></li>
+									</ul>
+								</div>
+								
+								<div class="scope-container checkables">
+									<span>Run as</span>
+									
+									<ul>
+										<li class="browser-style"><input type="radio" name="scope" class="scope" value="content"> <label>Content script</label></li>
+										<li class="browser-style"><input type="radio" name="scope" class="scope" value="background"> <label>Background script</label></li>
+									</ul>
+								</div>
+							</div>
+						</form>
+						
+						<div class="buttons">
+							<button type="button" class="move-up-button">Move Up</button>
+							<button type="button" class="move-down-button">Move Down</button>
+							<button type="button" class="delete-button">Delete Item</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div id="items"></div>
+			
+			<div class="main-action-container">
+				<button type="button" class="add-item-button browser-style">Add New Item</button>
+				<button type="button" class="add-separator-button browser-style">Add New Separator</button>
+			</div>
+		</div>
+		
+		<script src="options.js"></script>
+	</body>
+</html>

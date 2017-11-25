@@ -1,0 +1,352 @@
+body
+{
+	overflow: hidden;
+	padding: 2px;
+}
+
+body > div
+{
+	margin-bottom: 16px;
+}
+
+a:link,
+a:visited
+{
+	color: #0a8dff;
+	text-decoration: none;
+	transition:
+		color .15s;
+}
+
+a:hover
+{
+	color: #0060df;
+	text-decoration: underline;
+}
+
+a:active
+{
+	color: #003eaa;
+}
+
+.main-options
+{
+	margin-bottom: 16px;
+}
+
+.main-options > .left
+{
+	float: left;
+}
+
+.main-options > .right
+{
+	float: right;
+}
+
+.main-options:after
+{
+	clear: both;
+	content: "";
+	display: block;
+}
+
+.item
+{
+	position: relative;
+	top: 0;
+	transition:
+		height .5s,
+		opacity .5s .5s,
+		top .5s;
+}
+
+.item.new
+{
+	height: 0;
+	transition: none;
+}
+
+.item.deleted
+{
+	height: 0;
+	pointer-events: none;
+	transition:
+		height .5s,
+		top .5s;
+}
+
+.item.moved
+{
+	transition: none;
+}
+
+.item:after
+{
+	content: "";
+	display: block;
+	height: 16px;
+}
+
+.item-content
+{
+	background: #fff;
+	box-shadow: 0 0 1px rgba(0, 0, 0, .12);
+	color: #000;
+	padding: 16px;
+	position: relative;
+	transition:
+		box-shadow .15s,
+		opacity .5s;
+}
+
+.item-content:hover
+{
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .24);
+}
+
+.item-content:before
+{
+	bottom: 0;
+	color: #999;
+	content: "id: " attr(data-item-id);
+	line-height: 1.25;
+	position: absolute;
+	padding: 6px 8px 6px 8px;
+	right: 0;
+}
+
+.item.deleted .item-content
+{
+	opacity: 0;
+}
+
+.item.new .item-content
+{
+	opacity: 0;
+	transition: none;
+}
+
+.item-content button
+{
+	background: none;
+	border: 0;
+	color: #0087ff;
+	cursor: pointer;
+	margin: 4px 12px 8px -4px;
+	padding: 0 4px;
+	transition:
+		border .25s,
+		box-shadow .25s,
+		color .15s;
+}
+
+.item-content button + button
+{
+	margin-left: 12px;
+}
+
+.item-content button:hover
+{
+	color: #0052cc;
+	text-decoration: underline;
+}
+
+.cols-2
+{
+	display: flex;
+	flex-direction: row;
+}
+
+.cols-2 > .left,
+.cols-2 > .right
+{
+	flex: auto;
+}
+
+.cols-2 > .right
+{
+	margin-left: 16px;
+}
+
+.cols-2 > .minor
+{
+	flex: 0;
+	white-space: nowrap;
+}
+
+.prefs > .left > div
+{
+	margin-top: 16px;
+}
+
+.prefs > .left > div:first-child
+{
+	margin-top: 0;
+}
+
+.prefs .field
+{
+	margin-top: 4px;
+	width: 100%;
+}
+
+.prefs .file-selector
+{
+	margin-top: 4px;
+}
+
+.file-selector input[type=file]
+{
+	display: none;
+}
+
+.file-selector button
+{
+	margin-right: 0;
+}
+
+.item-content .icon-preview
+{
+	background: Menu;
+	border: 1px dashed #b1b1b1;
+	border-radius: 4px;
+	box-sizing: content-box;
+	display: inline-block;
+	height: 16px;
+	width: 16px;
+	margin: 0 0 6px;
+	padding: 3px;
+	vertical-align: middle;
+}
+
+.item-content .icon-preview:focus
+{
+	border-color: #0996f8;
+	box-shadow: 0 0 0 2px rgba(97, 181, 255, .75);
+}
+
+.item-content .icon-preview::-moz-focus-inner
+{
+	border: 0;
+}
+
+.item-content .icon-preview img
+{
+	display: block;
+	height: 16px;
+	width: 16px;
+}
+
+.prefs textarea
+{
+	resize: vertical;
+}
+
+.title-container .cols-2
+{
+	align-items: end;
+}
+
+.title-container > .minor > span
+{
+	visibility: hidden;
+}
+
+.separator-title-container
+{
+	position: relative;
+	text-align: center;
+}
+
+.separator-title-container:before
+{
+	border: 1px solid #000;
+	content: "";
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 50%;
+}
+
+.separator-title-container > span
+{
+	background: #fff;
+	padding: 0 8px;
+	position: relative;
+}
+
+.code-container
+{
+	position: relative;
+}
+
+.code-container .status
+{
+	display: inline-block;
+	position: relative;
+	vertical-align: bottom;
+}
+
+.code-container .status:before
+{
+	bottom: 0;
+	content: "";
+	font-size: 1.25em;
+	font-weight: bold;
+	line-height: 1em;
+	position: absolute;
+}
+
+.code-container .status-valid:before
+{
+	color: #12bc00;
+	content: "\2714";
+}
+
+.code-container .status-error:before
+{
+	color: #ff0039;
+	content: "\2716";
+}
+
+.item .checkables
+{
+	margin-bottom: 16px;
+}
+
+.checkables ul
+{
+	margin: 4px 0;
+	padding: 0;
+}
+
+.checkables li
+{
+	display: block;
+	list-style: none;
+}
+
+.checkables input[type=checkbox],
+.checkables input[type=radio]
+{
+	display: block;
+	opacity: 0;
+	position: absolute;
+	z-index: -1;
+}
+
+.checkables label:before
+{
+	vertical-align: middle;
+}
+
+.item .buttons
+{
+	margin-top: 8px;
+}
+
+.main-action-container
+{
+	text-align: center;
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<title>Contextlets API Reference</title>
+		<link rel="stylesheet" type="text/css" href="reference.css">
+	</head>
+	<body>
+		<div>
+			<div class="api-reference">
+				<h1>Contextlets API Reference</h1>
+				
+				<p>Content scripts run within a webpage and have direct access to the window object and DOM of the page. However, they don't have access to the JavaScript variables or functions that the page creates, or vice versa. This is a limitation of the WebExtension API. See <a href="https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Content_scripts#Content_script_environment">Content script environment</a> for details.</p>
+				
+				<p>Background scripts run within the browser infrastructure and have direct access to all WebExtension APIs that are available to the Contextlets extension. This includes the following privileged APIs: <span id="privileged-api-list"></span>.</p>
+				
+				<p>All scripts also have access to the following:</p>
+				
+				<dl>
+					<dt><code>this.code</code></dt>
+					<dd>
+						<p>The JavaScript code currently being executed.</p>
+					</dd>
+					
+					<dt><code>this.info</code></dt>
+					<dd>
+						<p><a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/menus/OnClickData">menus.OnClickData</a>. Information about the item clicked and the context where the click happened.</p>
+					</dd>
+					
+					<dt><code>this.itemSettings</code></dt>
+					<dd>
+						<p>A copy of the Contextlets configuration settings for this menu item.</p>
+					</dd>
+					
+					<dt><code>this.params</code></dt>
+					<dd>
+						<p>Initially always null. If this code was invoked by this.runAs(), <code>this.params</code> will be whatever was provided in the <var>params</var> argument of the call. Be aware that the data is converted to JSON and back during transit, so only JSON-serializable values will arrive here intact.</p>
+					</dd>
+					
+					<dt><code>this.tab</code></dt>
+					<dd>
+						<p><a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/Tab">tabs.Tab</a>. The details of the tab where the click took place. If the click did not take place in a tab, this parameter will be missing.</p>
+					</dd>
+					
+					<dt><code>this.message</code></dt>
+					<dd>
+						<p>An object containing just the above values, without the functions below.</p>
+					</dd>
+					
+					<dt><code>this.runAs(<var>scope</var>, <var>code</var>, <var>params</var>)</code></dt>
+					<dd>
+						<p>Asynchronously executes the given JavaScript code as either a background script or a content script. This works from any kind of script, and it can be useful if part of your code needs access to another scope's APIs. The code will have access to all the same <var>this</var> features listed here, but the values for <code>this.code</code>, <code>this.params</code>, and <code>this.message</code> will correspond to the newly-called code.</p>
+						
+						<p><var>scope</var> should be either "background" or "content". This indicates where to run the code, and thus what features it will have access to.</p>
+						
+						<p><var>code</var> may be either a string or a function. If it's a function, it will be serialized using <code>.toSource()</code>. This means it <strong>will not</strong> inherit any variables from the lexical scope in which it is defined. If you need to pass values to the function, use <var>params</var>.</p>
+						
+						<p><var>params</var> is optional and can be anything extra you want to pass to the invoked code. If provided, it <strong>must</strong> be serializable as JSON. If omitted or undefined, it will default to null.</p>
+					</dd>
+				</dl>
+			</div>
+		</div>
+		
+		<script type="text/javascript" src="reference.js"></script>
+	</body>
+</html>
