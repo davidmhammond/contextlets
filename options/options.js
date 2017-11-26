@@ -3,6 +3,7 @@
 var prefDefaults =
 {
 	items: [],
+	lineNumbers: false,
 	validate: true,
 };
 
@@ -211,13 +212,15 @@ browser.storage.local.get(prefDefaults).then(function (prefs)
 			});
 		});
 		
-		// Apply syntax checking logic/events to the code field.
+		// Apply syntax checking and line number logic/events to the code field.
 		
 		itemNode.querySelectorAll('.code-container').forEach(function (container)
 		{
 			var timer = null;
 			var statusNode = container.querySelector('.status');
 			var input = container.querySelector('textarea.code');
+			var lineNumbersNode = container.querySelector('.line-numbers > span');
+			var numDisplayedLines = 0;
 			var lastError = null;
 			
 			var validateSyntax = function ()
@@ -286,6 +289,24 @@ browser.storage.local.get(prefDefaults).then(function (prefs)
 				}, 100);
 			};
 			
+			var updateLineNumbers = function ()
+			{
+				var newlineMatches = input.value.match(/\r?\n/g);
+				var numLines = newlineMatches === null ? 1 : newlineMatches.length + 1;
+				
+				while (numLines > numDisplayedLines)
+				{
+					lineNumbersNode.appendChild(document.createElement('span'));
+					++numDisplayedLines;
+				}
+				
+				while (numLines < numDisplayedLines)
+				{
+					lineNumbersNode.removeChild(lineNumbersNode.lastChild);
+					--numDisplayedLines;
+				}
+			};
+			
 			if (!prefs.validate)
 			{
 				// Syntax checking is disabled.
@@ -293,8 +314,21 @@ browser.storage.local.get(prefDefaults).then(function (prefs)
 				statusNode.classList.add('disabled');
 			}
 			
+			if (prefs.lineNumbers)
+			{
+				container.querySelector('.code-editor').classList.add('with-line-numbers');
+			}
+			
 			input.addEventListener('input', validateSyntax);
 			input.addEventListener('focus', validateSyntax);
+			input.addEventListener('input', updateLineNumbers);
+			
+			input.addEventListener('scroll', function ()
+			{
+				lineNumbersNode.style.top = -input.scrollTop+'px';
+			});
+			
+			updateLineNumbers();
 		});
 		
 		// Set up labels and focus style helpers to checkboxes and radios.
@@ -535,6 +569,14 @@ browser.storage.local.get(prefDefaults).then(function (prefs)
 			
 			switch (input.name)
 			{
+			case 'lineNumbers':
+				document.querySelectorAll('.code-editor').forEach(function (node)
+				{
+					node.classList.toggle('with-line-numbers', input.checked);
+				});
+				
+				break;
+			
 			case 'validate':
 				document.querySelectorAll('.code-container .status').forEach(function (statusNode)
 				{

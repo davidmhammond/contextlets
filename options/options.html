@@ -16,6 +16,10 @@
 					<div class="browser-style">
 						<input type="checkbox" name="validate" id="validate-toggle"> <label for="validate-toggle">Enable JavaScript syntax checking</label>
 					</div>
+					
+					<div class="browser-style">
+						<input type="checkbox" name="lineNumbers" id="line-numbers-toggle"> <label for="line-numbers-toggle">Enable line numbers (disables word wrap)</label>
+					</div>
 				</div>
 			</div>
 			
@@ -59,7 +63,10 @@
 									<label>
 										<span>JavaScript Code <span class="status"></span></span>
 										
-										<textarea name="code" class="field code browser-style" rows="10"></textarea>
+										<div class="code-editor">
+											<textarea name="code" class="field code browser-style" rows="10"></textarea>
+											<span class="line-numbers"><span></span></span>
+										</div>
 									</label>
 								</div>
 								

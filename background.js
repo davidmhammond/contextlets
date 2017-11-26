@@ -5,6 +5,7 @@
 	var prefDefaults =
 	{
 		items: [],
+		lineNumbers: false,
 		validate: true,
 	};
 	

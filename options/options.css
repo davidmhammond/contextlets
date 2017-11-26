@@ -310,6 +310,72 @@ a:active
 	content: "\2716";
 }
 
+.code-editor textarea
+{
+	font-family: monospace;
+	font-size: 1em;
+}
+
+.line-numbers
+{
+	display: none;
+}
+
+.code-editor.with-line-numbers
+{
+	background: #fff;
+	font-family: monospace;
+	font-size: 1em;
+	position: relative;
+}
+
+.code-editor.with-line-numbers textarea
+{
+	background: transparent;
+	font: inherit;
+	padding-left: calc(3em + 14px);
+	position: relative;
+	white-space: pre;
+	z-index: 1;
+}
+
+.code-editor.with-line-numbers .line-numbers
+{
+	background: #f9f9fa;
+	bottom: 7px;
+	box-sizing: content-box;
+	color: #999;
+	display: block;
+	left: 1px;
+	overflow: hidden;
+	padding-right: 8px;
+	position: absolute;
+	top: 5px;
+	width: 3em;
+}
+
+.code-editor.with-line-numbers .line-numbers > span
+{
+	counter-reset: line-number;
+	display: block;
+	position: relative;
+	top: 0;
+}
+
+.code-editor.with-line-numbers .line-numbers > span > span
+{
+	display: block;
+}
+
+.code-editor.with-line-numbers .line-numbers > span > span:before
+{
+	counter-increment: line-number;
+	content: counter(line-number);
+	display: block;
+	text-align: right;
+	width: 3em;
+}
+
 .item .checkables
 {
 	margin-bottom: 16px;
