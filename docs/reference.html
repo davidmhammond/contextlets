@@ -58,6 +58,12 @@
 						<p><var>params</var> is optional and can be anything extra you want to pass to the invoked code. If provided, it <strong>must</strong> be serializable as JSON. If omitted or undefined, it will default to null.</p>
 					</dd>
 				</dl>
+				
+				<h2>URL Patterns</h2>
+				
+				<p>By default, menu items are not filtered by URL. If you want a menu item to only display on certain URLs, you can add one or more patterns into the "URL Patterns to Match" box, separated by line breaks. These patterns will be interpreted as <a href="https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Match_patterns">match patterns</a>.</p>
+				
+				<p>For the "Link", "Image", "Video", and "Audio" contexts, the patterns will be matched against the relevant element's URL (for example, the image's "src" URL). For other contexts, the patterns will be matched against the page's URL. For the "Frame" context, this will be the page that is inside the frame. If any patterns are present, the URL will need to match at least one of them.</p>
 			</div>
 		</div>
 		

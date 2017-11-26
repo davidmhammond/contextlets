@@ -145,9 +145,12 @@
 					{
 						switch (context)
 						{
+							case 'editable':
+							case 'frame':
 							case 'page':
-							case 'tab':
+							case 'password':
 							case 'selection':
+							case 'tab':
 								pageContexts.push(context);
 								break;
 							
