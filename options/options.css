@@ -61,13 +61,13 @@ a:active
 		top .5s;
 }
 
-.item.new
+.item.fade-in
 {
 	height: 0;
 	transition: none;
 }
 
-.item.deleted
+.item.fade-out
 {
 	height: 0;
 	pointer-events: none;
@@ -116,15 +116,15 @@ a:active
 	right: 0;
 }
 
-.item.deleted .item-content
-{
-	opacity: 0;
-}
-
-.item.new .item-content
+.item.fade-in .item-content
 {
 	opacity: 0;
 	transition: none;
+}
+
+.item.fade-out .item-content
+{
+	opacity: 0;
 }
 
 .item-content button
