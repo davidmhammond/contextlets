@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Contextlets",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Allows you to add custom context menu items that execute JavaScript.",
 	"homepage_url": "https://github.com/davidmhammond/contextlets",
 	"permissions":
