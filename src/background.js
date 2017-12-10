@@ -255,7 +255,10 @@
 		browser.storage.local.get(prefDefaults).then(function (prefs)
 		{
 			var itemId = (info.menuItemId+'').replace(/-(?:page|object)$/, '');
-			var item = prefs.items[itemId];
+			var item = prefs.items.find(function (item)
+			{
+				return item.id == itemId;
+			});
 			
 			if (item === undefined)
 			{
