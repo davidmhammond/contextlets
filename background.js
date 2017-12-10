@@ -97,8 +97,10 @@
 			
 			browser.contextMenus.removeAll(function ()
 			{
-				renderers = [];
-				rendererLookup = {};
+				renderers.forEach(function (renderer)
+				{
+					renderer.items = [];
+				});
 				
 				prefs.items.forEach(function (item)
 				{
