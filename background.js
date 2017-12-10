@@ -9,6 +9,9 @@
 		validate: true,
 	};
 	
+	var renderers = [];
+	var rendererLookup = {};
+	
 	/**
 	 * Create the API for the user's script.
 	 */
@@ -94,6 +97,9 @@
 			
 			browser.contextMenus.removeAll(function ()
 			{
+				renderers = [];
+				rendererLookup = {};
+				
 				prefs.items.forEach(function (item)
 				{
 					if (item.contexts.length == 0)
@@ -159,9 +165,26 @@
 						}
 					});
 					
+					if (item.extensionId == null)
+					{
+						item.extensionId = browser.runtime.id;
+					}
+					
+					if (!Object.prototype.hasOwnProperty.call(rendererLookup, item.extensionId))
+					{
+						rendererLookup[item.extensionId] = renderers.length;
+						renderers.push(
+						{
+							extensionId: item.extensionId,
+							items: [],
+						});
+					}
+					
+					var index = rendererLookup[item.extensionId];
+					
 					if (pageContexts.length > 0)
 					{
-						browser.contextMenus.create(Object.assign(
+						renderers[index].items.push(Object.assign(
 						{
 							contexts: pageContexts,
 							documentUrlPatterns: item.documentUrlPatterns === undefined ? patterns : item.documentUrlPatterns,
@@ -172,7 +195,7 @@
 					
 					if (objectContexts.length > 0)
 					{
-						browser.contextMenus.create(Object.assign(
+						renderers[index].items.push(Object.assign(
 						{
 							contexts: objectContexts,
 							documentUrlPatterns: item.documentUrlPatterns,
@@ -181,29 +204,64 @@
 						}, commonSettings));
 					}
 				});
+				
+				var runNextRenderer = function (index)
+				{
+					if (index >= renderers.length)
+					{
+						return;
+					}
+					
+					var renderer = renderers[index];
+					
+					if (renderer.extensionId === browser.runtime.id)
+					{
+						// Local menu items.
+						
+						renderer.items.forEach(function (item)
+						{
+							browser.contextMenus.create(item);
+						});
+						
+						runNextRenderer(index + 1);
+					}
+					else
+					{
+						// Menu items that will be rendered by another extension.
+						
+						browser.runtime.sendMessage(renderer.extensionId,
+						{
+							type: 'contextlets:items',
+							items: renderer.items,
+						}).then(function ()
+						{
+							runNextRenderer(index + 1);
+						});
+					}
+				};
+				
+				runNextRenderer(0);
 			});
 		});
 	};
 	
-	// Events to trigger reloading of the content menu items.
-	
-	browser.runtime.onInstalled.addListener(update);
-	browser.runtime.onStartup.addListener(update);
-	browser.storage.onChanged.addListener(function (prefs)
-	{
-		if (prefs.items)
-		{
-			update();
-		}
-	});
-	
-	// Listen for menu item clicks.
-	
-	browser.contextMenus.onClicked.addListener(function (info, tab)
+	/**
+	 * Run the script associated with a context menu item.
+	 */
+	var menuItemClicked = function (info, tab)
 	{
 		browser.storage.local.get(prefDefaults).then(function (prefs)
 		{
-			var item = prefs.items[info.menuItemId.replace(/-(?:page|object)$/, '')];
+			var itemId = (info.menuItemId+'').replace(/-(?:page|object)$/, '');
+			var item = prefs.items[itemId];
+			
+			if (item === undefined)
+			{
+				// Invalid item ID passed.
+				
+				return;
+			}
+			
 			var message =
 			{
 				code: item.code,
@@ -229,17 +287,62 @@
 				throw new Error('Unrecognized scope.');
 			}
 		});
+	};
+	
+	// Events to trigger reloading of the content menu items.
+	
+	browser.runtime.onInstalled.addListener(update);
+	browser.runtime.onStartup.addListener(update);
+	browser.storage.onChanged.addListener(function (prefs)
+	{
+		if (prefs.items)
+		{
+			update();
+		}
 	});
+	
+	// Listen for menu item clicks.
+	
+	browser.contextMenus.onClicked.addListener(menuItemClicked);
 	
 	// Listen for messages coming from the content script.
 	
 	browser.runtime.onMessage.addListener(function (message)
 	{
-		if (message.code !== undefined)
+		if (Object.prototype.hasOwnProperty.call(message, 'code'))
 		{
 			// We've received a call from the content script.
 			
 			execute.call(createAPI(message));
+		}
+	});
+	
+	// Listen for messages coming from other extensions.
+	
+	browser.runtime.onMessageExternal.addListener(function (message, sender)
+	{
+		if (!Object.prototype.hasOwnProperty.call(rendererLookup, sender.id))
+		{
+			// No items are associated with this extension. Ignore the message.
+			
+			return;
+		}
+		
+		switch (message.type)
+		{
+		case 'contextlets:clicked':
+			if (Object.prototype.hasOwnProperty.call(message, 'info') && Object.prototype.hasOwnProperty.call(message, 'tab'))
+			{
+				// We've received a click from a helper extension.
+				
+				menuItemClicked(message.info, message.tab);
+			}
+			
+			break;
+		
+		case 'contextlets:update':
+			update();
+			break;
 		}
 	});
 })(function ()

@@ -7,8 +7,14 @@ var prefDefaults =
 	validate: true,
 };
 
-browser.storage.local.get(prefDefaults).then(function (prefs)
-{
+Promise.all(
+[
+	browser.storage.local.get(prefDefaults),
+	browser.management.getAll(),
+]).then(function (values)
+	{
+	var [prefs, extensionInfos] = values;
+	
 	/**
 	 * Use CSS transitions to display a newly-created box.
 	 */
@@ -384,6 +390,67 @@ browser.storage.local.get(prefDefaults).then(function (prefs)
 			});
 		});
 		
+		itemNode.querySelectorAll('.renderer').forEach(function (div)
+		{
+			if (item.extensionId == null)
+			{
+				item.extensionId = browser.runtime.id;
+			}
+			
+			if (extraExtensions.length == 0 && item.extensionId === browser.runtime.id)
+			{
+				div.parentNode.removeChild(div);
+				return;
+			}
+			
+			div.querySelectorAll('select').forEach(function (select)
+			{
+				var selectionExists = false;
+				
+				select.addEventListener('change', function ()
+				{
+					item.extensionId = select.value;
+					item.extensionName = select.selectedOptions[0].textContent;
+					save();
+				});
+				
+				select.querySelectorAll('option').forEach(function (option)
+				{
+					option.value = browser.runtime.id;
+					
+					if (item.extensionId === browser.runtime.id)
+					{
+						option.selected = true;
+						selectionExists = true;
+					}
+				});
+				
+				extraExtensions.forEach(function (extensionInfo)
+				{
+					var option = document.createElement('option');
+					option.value = extensionInfo.id;
+					option.textContent = extensionInfo.name;
+					
+					if (item.extensionId === extensionInfo.id)
+					{
+						option.selected = true;
+						selectionExists = true;
+					}
+					
+					select.appendChild(option);
+				});
+				
+				if (!selectionExists)
+				{
+					var option = document.createElement('option');
+					option.value = item.extensionId;
+					option.textContent = item.extensionName+' (Inactive)';
+					option.selected = true;
+					select.appendChild(option);
+				}
+			});
+		});
+		
 		// Set up default selections and save events for scope radios.
 		
 		itemNode.querySelectorAll('.scope').forEach(function (input)
@@ -545,6 +612,20 @@ browser.storage.local.get(prefDefaults).then(function (prefs)
 	var templateNode = document.querySelector('#item-template .item');
 	var itemListNode = document.querySelector('#items');
 	var lastId = -1;
+	var extraExtensions = [];
+	
+	extensionInfos.forEach(function (extensionInfo)
+	{
+		if (/^extra contextlet/i.test(extensionInfo.name))
+		{
+			extraExtensions.push(extensionInfo);
+		}
+	});
+	
+	extraExtensions.sort(function (a, b)
+	{
+		return a.name.replace(/\D+/g) - b.name.replace(/\D+/g);
+	});
 	
 	// Set up the UI for the global options.
 	

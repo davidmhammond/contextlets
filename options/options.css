@@ -407,6 +407,11 @@ a:active
 	vertical-align: middle;
 }
 
+.renderer select
+{
+	display: block;
+}
+
 .item .buttons
 {
 	margin-top: 8px;
