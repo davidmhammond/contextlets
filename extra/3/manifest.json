@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Extra Contextlet #3",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Add an additional Contextlet to the top-level context menu. Requires the Contextlets extension.",
 	"homepage_url": "https://github.com/davidmhammond/contextlets",
 	"permissions":
