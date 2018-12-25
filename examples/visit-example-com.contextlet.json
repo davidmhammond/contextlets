@@ -1,0 +1,1 @@
+{"code":"document.location = 'https://example.com/';","contexts":["page","frame"],"icons":null,"patterns":"","scope":"content","title":"Visit example.com","type":"normal"}

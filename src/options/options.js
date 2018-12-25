@@ -46,6 +46,7 @@ Promise.all(
 	var animateFadeOut = function (node, callback)
 	{
 		node.style.height = node.offsetHeight+'px';
+		node.style.pointerEvents = 'none';
 		
 		window.setTimeout(function ()
 		{
@@ -59,13 +60,13 @@ Promise.all(
 					callback();
 				}
 			}, 500);
-		}, 0);
+		}, 20);
 	};
 	
 	/**
 	 * Add a new menu item and its configuration UI.
 	 */
-	var createItem = function (type)
+	var createItem = function (properties)
 	{
 		++lastId;
 		var item =
@@ -79,8 +80,13 @@ Promise.all(
 			patterns: '',
 			scope: 'content',
 			title: '',
-			type: type,
+			type: 'normal',
 		};
+		
+		if (properties !== undefined)
+		{
+			Object.assign(item, properties);
+		}
 		
 		prefs.items.push(item);
 		var itemNode = createItemNode(item);
@@ -159,14 +165,54 @@ Promise.all(
 				{
 					iconPreview.innerHTML = '';
 					
-					if (typeof item.icons != 'string')
+					var icon;
+					
+					if (typeof item.icons == 'object')
+					{
+						if (item.icons !== null)
+						{
+							var bestSize;
+							
+							Object.getOwnPropertyNames(item.icons).forEach(function (property)
+							{
+								if (/^[1-9]\d*$/.test(property))
+								{
+									var size = +property;
+									
+									if (icon !== undefined)
+									{
+										if (size < 16 || bestSize < 16)
+										{
+											if (size <= bestSize)
+											{
+												return;
+											}
+										}
+										else if (size >= bestSize)
+										{
+											return;
+										}
+									}
+									
+									icon = item.icons[property];
+									bestSize = size;
+								}
+							});
+						}
+					}
+					else
+					{
+						icon = item.icons;
+					}
+					
+					if (icon === undefined)
 					{
 						return;
 					}
 					
 					var img = document.createElement('img');
 					img.alt = 'Icon';
-					img.src = item.icons;
+					img.src = icon;
 					iconPreview.appendChild(img);
 				}
 			};
@@ -407,6 +453,16 @@ Promise.all(
 			{
 				var selectionExists = false;
 				
+				select.addEventListener('focus', function ()
+				{
+					select.classList.add('focused');
+				});
+				
+				select.addEventListener('blur', function ()
+				{
+					select.classList.remove('focused');
+				});
+				
 				select.addEventListener('change', function ()
 				{
 					item.extensionId = select.value;
@@ -499,6 +555,77 @@ Promise.all(
 						itemNode.parentNode.removeChild(itemNode);
 					});
 				}
+			});
+		});
+		
+		// Set up the Export button.
+		
+		itemNode.querySelectorAll('.export-button').forEach(function (button)
+		{
+			button.addEventListener('click', function ()
+			{
+				var exportItem =
+				{
+					code: item.code,
+					contexts: item.contexts,
+					icons: item.icons,
+					patterns: item.patterns,
+					scope: item.scope,
+					title: item.title,
+					type: item.type,
+				};
+				
+				// Create a reasonable filename with no special characters.
+				
+				var letters = 'abcdefghijklmnopqrstuvwxyz';
+				var collator = new Intl.Collator('en-US', {caseFirst: 'lower', sensitivity: 'case'});
+				var filename = item.title
+					.replace(/&?%s|&[\S\s]/g, function (match)
+					{
+						if (match.substring(match.length - 2) == '%s')
+						{
+							return '-selection-';
+						}
+						
+						return match.substring(1);
+					})
+					.replace(/['\u2019]/g, '')
+					.toLowerCase()
+					.replace(/[^a-z0-9]/g, function (match)
+					{
+						// Transliterate to ASCII the best we can in vanilla JS.
+						
+						if (collator.compare(match, 'a') >= 0 && collator.compare(match, 'Z') < 0)
+						{
+							for (var i = letters.length - 1; i >= 0; --i)
+							{
+								if (collator.compare(match, letters.charAt(i)) >= 0)
+								{
+									return letters.charAt(i);
+								}
+							}
+						}
+						
+						return '-';
+					})
+					.replace(/-+/g, '-')
+					.replace(/^-+|-+$/g, '');
+				
+				if (filename == '')
+					{
+					filename = item.id;
+					}
+				
+				filename += '.contextlet.json';
+				
+				var link = document.createElement('a');
+				link.href = 'data:application/json,'+encodeURIComponent(JSON.stringify(exportItem));
+				link.download = filename;
+				link.hidden = true;
+				link.style.display = 'none';
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
 			});
 		});
 		
@@ -602,6 +729,22 @@ Promise.all(
 	};
 	
 	/**
+	 * Output a line to the import results.
+	 */
+	var addImportResult = function (message, isError)
+	{
+		var p = document.createElement('p');
+		
+		if (isError === true)
+		{
+			p.className = 'error';
+		}
+		
+		p.textContent = message;
+		importResultNode.appendChild(p);
+	};
+	
+	/**
 	 * Asychronously save all changes to the prefs.
 	 */
 	var save = function ()
@@ -610,9 +753,12 @@ Promise.all(
 	};
 	
 	var templateNode = document.querySelector('#item-template .item');
+	var importResultNode = document.querySelector('#import-result');
 	var itemListNode = document.querySelector('#items');
 	var lastId = -1;
 	var extraExtensions = [];
+	var supportedContextSet = new Set();
+	var supportedScopeSet = new Set();
 	
 	extensionInfos.forEach(function (extensionInfo)
 	{
@@ -625,6 +771,20 @@ Promise.all(
 	extraExtensions.sort(function (a, b)
 	{
 		return a.name.replace(/\D+/g) - b.name.replace(/\D+/g);
+	});
+	
+	// Gather the set of supported contexts.
+	
+	templateNode.querySelectorAll('.context-container input.context').forEach(function (input)
+	{
+		supportedContextSet.add(input.value);
+	});
+	
+	// Gather the set of supported scopes.
+	
+	templateNode.querySelectorAll('.scope-container input.scope').forEach(function (input)
+	{
+		supportedScopeSet.add(input.value);
 	});
 	
 	// Set up the UI for the global options.
@@ -705,7 +865,7 @@ Promise.all(
 	{
 		button.addEventListener('click', function ()
 		{
-			createItem('normal');
+			createItem({type: 'normal'});
 		});
 	});
 	
@@ -713,7 +873,255 @@ Promise.all(
 	{
 		button.addEventListener('click', function ()
 		{
-			createItem('separator');
+			createItem({type: 'separator'});
+		});
+	});
+	
+	document.querySelectorAll('.import-button').forEach(function (button)
+	{
+		button.addEventListener('click', function ()
+		{
+			importResultNode.textContent = '';
+			var numErrors = 0;
+			var numSuccess = 0;
+			
+			var addError = function (message)
+			{
+				++numErrors;
+				addImportResult(message, true);
+			};
+			
+			var input = document.createElement('input');
+			input.type = 'file';
+			input.hidden = true;
+			input.multiple = true;
+			input.style.display = 'none';
+			
+			input.addEventListener('change', function ()
+			{
+				if (input.files.length == 0)
+				{
+					return;
+				}
+				
+				var fileIndex = -1;
+				
+				var processNextFile = function ()
+				{
+					++fileIndex;
+					
+					if (fileIndex >= input.files.length)
+					{
+						// Import is complete.
+						
+						var result = [];
+						
+						if (numSuccess > 0)
+						{
+							result.push(numSuccess+' item'+(numSuccess == 1 ? '' : 's')+' successfully imported.');
+						}
+						
+						if (numErrors > 0)
+						{
+							result.push(numErrors+' error'+(numErrors == 1 ? '' : 's')+' occurred during import.');
+						}
+						
+						if (result.length == 0)
+						{
+							result.push('No items found to import.');
+						}
+						
+						addImportResult(result.join(' '));
+						return;
+					}
+					
+					var file = input.files[fileIndex];
+					var reader = new FileReader();
+					
+					reader.addEventListener('load', function ()
+					{
+						var isArray;
+						var itemIndex;
+						
+						try
+						{
+							var items = JSON.parse(reader.result);
+							var importItems = [];
+							isArray = (items instanceof Array);
+							
+							if (!isArray)
+							{
+								items = [items];
+							}
+							
+							items.forEach(function (item, index)
+							{
+								if (isArray)
+								{
+									itemIndex = index;
+								}
+								
+								// Validate the import item.
+								
+								var requiredProperties =
+								[
+									'code',
+									'contexts',
+									'scope',
+									'title',
+									'type',
+								];
+								
+								requiredProperties.forEach(function (property)
+								{
+									if (!Object.prototype.hasOwnProperty.call(item, property))
+									{
+										throw new Error('Missing required property "'+property+'"');
+									}
+								});
+								
+								if (typeof item.code != 'string')
+								{
+									throw new Error('"code" must be a string; '+(typeof item.code)+' given');
+								}
+								
+								if (!(item.contexts instanceof Array))
+								{
+									throw new Error('"contexts" must be an Array; '+(typeof item.contexts)+' given');
+								}
+								
+								item.contexts.forEach(function (context)
+								{
+									if (typeof context != 'string')
+									{
+										throw new Error('Context values must be strings; '+(typeof context)+' given');
+									}
+									
+									if (!supportedContextSet.has(context))
+									{
+										throw new Error('Context value "'+context+'" is not supported');
+									}
+								});
+								
+								if (typeof item.scope != 'string')
+								{
+									throw new Error('"scope" must be a string; '+(typeof item.scope)+' given');
+								}
+								
+								if (!supportedScopeSet.has(item.scope))
+								{
+									throw new Error('Scope value "'+item.scope+'" is not supported');
+								}
+								
+								if (typeof item.title != 'string')
+								{
+									throw new Error('"title" must be a string; '+(typeof item.title)+' given');
+								}
+								
+								if (item.type !== 'normal' && item.type !== 'separator')
+								{
+									throw new Error('"type" must be either "normal" or "separator"');
+								}
+								
+								var importItem =
+								{
+									code: item.code,
+									contexts: item.contexts,
+									scope: item.scope,
+									title: item.title,
+									type: item.type,
+								};
+								
+								if (Object.prototype.hasOwnProperty.call(item, 'icons'))
+								{
+									if (typeof item.icons == 'object')
+									{
+										if (item.icons !== null)
+										{
+											Object.getOwnPropertyNames(item.icons).forEach(function (property)
+											{
+												if (!/^[1-9]\d*$/.test(property))
+												{
+													throw new Error('Invalid icon size "'+property+'"');
+												}
+												
+												if (typeof item.icons[property] != 'string')
+												{
+													throw new Error('Icon value for size "'+property+'" must be a string; '+(typeof item.icons[property])+' given');
+												}
+												
+												if (item.icons[property].substring(0, 5) != 'data:')
+												{
+													throw new Error('Icon value for size "'+property+'" must be a data URI');
+												}
+											});
+										}
+									}
+									else if (typeof item.icons == 'string')
+									{
+										if (item.icons.substring(0, 5) != 'data:')
+										{
+											throw new Error('Icon string must be a data URI');
+										}
+									}
+									else
+									{
+										throw new Error('When present, "icons" must be a string, object, or null; '+(typeof item.icons)+' given');
+									}
+									
+									importItem.icons = item.icons;
+								}
+								
+								if (Object.prototype.hasOwnProperty.call(item, 'patterns'))
+								{
+									if (typeof item.patterns != 'string')
+									{
+										throw new Error('When present, "patterns" must be a string; '+(typeof item.patterns)+' given');
+									}
+									
+									importItem.patterns = item.patterns;
+								}
+								
+								importItems.push(importItem);
+							});
+							
+							importItems.forEach(function (importItem)
+							{
+								createItem(importItem);
+								++numSuccess;
+							});
+						}
+						catch (error)
+						{
+							if (error instanceof SyntaxError)
+							{
+								addError('File "'+file.name+'" is not a valid JSON file.');
+							}
+							else
+							{
+								var context = error.constructor.name;
+								
+								if (itemIndex !== undefined)
+								{
+									context = ' in item index '+itemIndex;
+								}
+								
+								addError('File "'+file.name+'" is not a valid contextlet file ('+context+': '+error.message+').');
+							}
+						}
+						
+						window.setTimeout(processNextFile, 0);
+					});
+					
+					reader.readAsText(file);
+				}
+				
+				processNextFile();
+			});
+			
+			document.body.appendChild(input);
+			input.click();
+			document.body.removeChild(input);
 		});
 	});
 });

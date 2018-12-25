@@ -2,23 +2,32 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-		<title>Options Page</title>
+		<title>Contextlets</title>
+		<link rel="stylesheet" type="text/css" href="chrome://browser/content/extension.css">
 		<link rel="stylesheet" type="text/css" href="options.css">
+		<link rel="icon" type="image/png" href="/images/contextlets-16.png">
 	</head>
 	<body>
 		<div>
-			<div class="main-options">
+			<div class="main-header">
 				<div class="left">
+					<h1>Contextlets</h1>
+					<p>By <a href="https://addons.mozilla.org/en-US/firefox/user/1033771/" target="_blank">David Hammond</a></p>
+				</div>
+				
+				<div class="center">
 					<a href="/docs/reference.html" target="_blank">API Reference</a>
 				</div>
 				
-				<div class="right checkables">
-					<div class="browser-style">
-						<input type="checkbox" name="validate" id="validate-toggle"> <label for="validate-toggle">Enable JavaScript syntax checking</label>
-					</div>
-					
-					<div class="browser-style">
-						<input type="checkbox" name="lineNumbers" id="line-numbers-toggle"> <label for="line-numbers-toggle">Enable line numbers (disables word wrap)</label>
+				<div class="right">
+					<div class="main-options checkables">
+						<div class="browser-style">
+							<input type="checkbox" name="validate" id="validate-toggle"> <label for="validate-toggle">Enable JavaScript syntax checking</label>
+						</div>
+						
+						<div class="browser-style">
+							<input type="checkbox" name="lineNumbers" id="line-numbers-toggle"> <label for="line-numbers-toggle">Enable line numbers (disables word wrap)</label>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -122,6 +131,7 @@
 							<button type="button" class="move-up-button">Move Up</button>
 							<button type="button" class="move-down-button">Move Down</button>
 							<button type="button" class="delete-button">Delete Item</button>
+							<button type="button" class="export-button">Export</button>
 						</div>
 					</div>
 				</div>
@@ -132,6 +142,10 @@
 			<div class="main-action-container">
 				<button type="button" class="add-item-button browser-style">Add New Item</button>
 				<button type="button" class="add-separator-button browser-style">Add New Separator</button>
+				<button type="button" class="import-button browser-style">Import</button>
+			</div>
+			
+			<div id="import-result">
 			</div>
 		</div>
 		

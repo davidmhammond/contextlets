@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Contextlets",
-	"version": "0.3.1",
+	"version": "0.4.0",
 	"description": "Add context menu items that execute custom JavaScript.",
 	"homepage_url": "https://github.com/davidmhammond/contextlets",
 	"permissions":
@@ -12,6 +12,7 @@
 		"contextMenus",
 		"downloads",
 		"management",
+		"menus",
 		"storage",
 		"tabs",
 		"<all_urls>"
@@ -47,6 +48,7 @@
 	"options_ui":
 	{
 		"page": "options/options.html",
-		"browser_style": true
+		"browser_style": true,
+		"open_in_tab": true
 	}
 }
