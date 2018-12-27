@@ -1,0 +1,25 @@
+{
+	"manifest_version": 2,
+	"name": "Extra Contextlet #6",
+	"version": "0.1.1",
+	"description": "Add an additional Contextlet to the top-level context menu. Requires the Contextlets extension.",
+	"homepage_url": "https://github.com/davidmhammond/contextlets",
+	"permissions":
+	[
+		"contextMenus"
+	],
+	"applications":
+	{
+		"gecko":
+		{
+			"id": "{b27dfc43-eedd-4c19-bece-598e7bbec817}"
+		}
+	},
+	"background":
+	{
+		"scripts":
+		[
+			"background.js"
+		]
+	}
+}
