@@ -74,7 +74,7 @@
 			// lexical scope). "this" should be inherited from where
 			// the eval is run.
 			
-			code = '('+code.toSource()+').call(this);';
+			code = '('+code+').call(this);';
 		}
 		else
 		{
