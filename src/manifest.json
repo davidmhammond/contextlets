@@ -17,6 +17,12 @@
 		"tabs",
 		"<all_urls>"
 	],
+	"icons": {
+		"16": "images/contextlets-16.png",
+		"32": "images/contextlets-32.png",
+		"48": "images/contextlets-48.png",
+		"64": "images/contextlets-64.png"
+	},
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
 	"applications":
 	{
